@@ -5,6 +5,8 @@ import kotlin.NotImplementedError;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class JavaTasks {
@@ -175,35 +177,44 @@ public class JavaTasks {
      */
     static public void sortSequence(String inputName, String outputName) {
         ArrayList<Integer> list = new ArrayList<>();
+        Map<Integer, Integer> map = new HashMap<>();
+        int min = Integer.MAX_VALUE;
+        int count = 0;
+        int value = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
             String strLine;
             while ((strLine = br.readLine()) != null) {
-                list.add(Integer.parseInt(strLine));
-            }
-            int min = list.get(0);
-            int count = Collections.frequency(list, list.get(0));
-            for (int el : list) {
-                int counter = Collections.frequency(list, el);
-                if (counter > count || (counter == count && el < min)) {
-                    min = el;
-                    count = counter;
+                int key = Integer.parseInt(strLine);
+                list.add(key);
+                if (map.containsKey(key)){
+                    value = map.get(key);
+                    map.put(key, value + 1);
+                    if (value > count || (value == count && key < min)){
+                        count = value;
+                        min = key;
+                    }
+                } else {
+                    map.put(key, 1);
+                    if (value == count && key < min){
+                        min = key;
+                    }
                 }
             }
-            list.removeAll(Collections.singletonList(min));
-            ArrayList<Integer> second = new ArrayList<>(Collections.nCopies(count, min));
             BufferedWriter bw = new BufferedWriter(new FileWriter(outputName));
             for (int el : list) {
-                bw.write(Integer.toString(el));
-                bw.newLine();
+                if (el != min) {
+                    bw.write(Integer.toString(el));
+                    bw.newLine();
+                }
             }
-            for (int el : second) {
-                bw.write(Integer.toString(el));
+            for (int i = 0; i < count + 1; i++){
+                bw.write(String.valueOf(min));
                 bw.newLine();
             }
             bw.close();
-            } catch(IOException e){
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
         /**
