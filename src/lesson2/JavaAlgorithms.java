@@ -97,7 +97,21 @@ public class JavaAlgorithms {
      * вернуть ту из них, которая встречается раньше в строке first.
      */
     static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+        int[][] table = new int[firs.length()][second.length()];
+        int longest = 0;
+        int max = 0;
+        for (int i = 0; i < firs.length(); i++) {
+            for (int j = 0; j < second.length(); j++) {
+                if (firs.charAt(i) == second.charAt(j)) {
+                    table[i][j] += (i == 0 || j == 0) ? 1 : 1 + table[i - 1][j - 1];
+                    if (table[i][j] > longest) {
+                        longest = table[i][j];
+                        max = i + 1;
+                    }
+                }
+            }
+        } if (max == 0) return "";
+        return firs.substring(max - longest, max);
     }
 
     /**

@@ -2,6 +2,10 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -33,7 +37,29 @@ public class JavaTasks {
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
     static public void sortTimes(String inputName, String outputName) {
-        throw new NotImplementedError();
+        ArrayList<Integer> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                String[] line = strLine.split(":");
+                list.add(Integer.parseInt(line[0]) * 3600 + Integer.parseInt(line[1]) * 60 + Integer.parseInt(line[2]));
+            }
+            int[] arr = list.stream().mapToInt(i -> i).toArray();
+            Sorts.quickSort(arr);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(outputName));
+            for(int time : arr){
+                int hours = time / 3600;
+                int min = (time % 3600) / 60;
+                int sec = time % 60;
+                bw.write((hours < 10 ? "0" + hours : hours) + ":" +
+                        (min < 10 ? "0" + min : min) + ":" +
+                        (sec < 10 ? "0" + sec : sec));
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -97,7 +123,25 @@ public class JavaTasks {
      * 121.3
      */
     static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+        ArrayList<Double> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                double temp = Double.parseDouble(strLine);
+                if (temp >= -237.0 || temp <= 500.0)
+                    list.add(temp);
+                else throw new NumberFormatException();
+            }
+            Collections.sort(list);
+            BufferedWriter bw = new BufferedWriter(new FileWriter(outputName));
+            for (double el : list) {
+                bw.write(String.valueOf(el));
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -130,10 +174,39 @@ public class JavaTasks {
      * 2
      */
     static public void sortSequence(String inputName, String outputName) {
-        throw new NotImplementedError();
+        ArrayList<Integer> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                list.add(Integer.parseInt(strLine));
+            }
+            int min = list.get(0);
+            int count = Collections.frequency(list, list.get(0));
+            for (int el : list) {
+                int counter = Collections.frequency(list, el);
+                if (counter > count || (counter == count && el < min)) {
+                    min = el;
+                    count = counter;
+                }
+            }
+            list.removeAll(Collections.singletonList(min));
+            ArrayList<Integer> second = new ArrayList<>(Collections.nCopies(count, min));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(outputName));
+            for (int el : list) {
+                bw.write(Integer.toString(el));
+                bw.newLine();
+            }
+            for (int el : second) {
+                bw.write(Integer.toString(el));
+                bw.newLine();
+            }
+            bw.close();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
     }
 
-    /**
+        /**
      * Соединить два отсортированных массива в один
      *
      * Простая
