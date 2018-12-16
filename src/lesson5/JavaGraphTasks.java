@@ -2,8 +2,7 @@ package lesson5;
 
 import kotlin.NotImplementedError;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -93,8 +92,57 @@ public class JavaGraphTasks {
      *
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
+    // Трудоемкость O(N^2*M), где N - количество ребер, M - количество независимых множеств.
+    // Ресурсоемкость O(N)
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        Set<Graph.Vertex> firstVertices = graph.getVertices();
+        Set<Graph.Vertex> secondVertices = new HashSet<>();
+        Set<Graph.Vertex> independentSet = new HashSet<>();
+        Set<Graph.Vertex> maxIndependentSet = new HashSet<>();
+        return findIndependentVertexSet(graph, maxIndependentSet, independentSet, firstVertices, secondVertices);
+    }
+
+    private static Set<Graph.Vertex> findIndependentVertexSet(Graph graph, Set<Graph.Vertex> maxIndependentSet,
+                                                              Set<Graph.Vertex> independentSet,
+                                                              Set<Graph.Vertex> firstVertices,
+                                                              Set<Graph.Vertex> secondVertices) {
+        while (isFind(graph, firstVertices, secondVertices)) {
+            Graph.Vertex vertex = firstVertices.stream().findAny().get();
+            independentSet.add(vertex);
+            Set<Graph.Vertex> newFirstVertices = new HashSet<>(firstVertices);
+            Set<Graph.Vertex> newSecondVertices = new HashSet<>(secondVertices);
+            newFirstVertices.removeIf(v -> graph.getNeighbors(v).contains(vertex));
+            newSecondVertices.removeIf(v -> graph.getNeighbors(v).contains(vertex));
+            newFirstVertices.remove(vertex);
+            if (newFirstVertices.isEmpty() && newSecondVertices.isEmpty()) {
+                if (independentSet.size() > maxIndependentSet.size()) {
+                    maxIndependentSet = new HashSet<>(independentSet);
+                }
+            } else {
+                maxIndependentSet = findIndependentVertexSet(graph, maxIndependentSet,
+                        independentSet, newFirstVertices, newSecondVertices);
+            }
+            independentSet.remove(vertex);
+            firstVertices.remove(vertex);
+            secondVertices.add(vertex);
+        }
+        return maxIndependentSet;
+    }
+
+    private static boolean isFind(Graph graph, Set<Graph.Vertex> firstVertices, Set<Graph.Vertex> secondVertices) {
+        boolean isFind = false;
+        if (firstVertices.isEmpty())
+            return false;
+        for (Graph.Vertex s : secondVertices) {
+            for (Graph.Vertex f : firstVertices) {
+                isFind = graph.getNeighbors(s).contains(f);
+                if (isFind) break;
+            }
+            if (!isFind)
+                return false;
+            isFind = false;
+        }
+        return true;
     }
 
     /**
@@ -117,7 +165,27 @@ public class JavaGraphTasks {
      *
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
      */
+    // Трудоемкость O(N!), где N - количество вершин.
+    // Ресурсоемкость O(N!)
     public static Path longestSimplePath(Graph graph) {
-        throw new NotImplementedError();
+        LinkedList<Path> list = new LinkedList<>();
+        for (Graph.Vertex vertex : graph.getVertices())
+            list.add(new Path(vertex));
+        Path result = null;
+        int length = 0;
+        while (!list.isEmpty()){
+            Path currentPath = list.remove();
+            if (currentPath.getLength() > length) {
+                result = currentPath;
+                length = currentPath.getLength();
+                if (result.getLength() == graph.getVertices().size())
+                    break;
+            }
+            List<Graph.Vertex> vertices = currentPath.getVertices();
+            for (Graph.Vertex neighbor : graph.getNeighbors(vertices.get(vertices.size() - 1)))
+                if (!currentPath.contains(neighbor))
+                    list.add(new Path(currentPath, graph, neighbor));
+        }
+        return result;
     }
 }

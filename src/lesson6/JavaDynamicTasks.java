@@ -2,8 +2,12 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import static java.lang.Math.min;
 @SuppressWarnings("unused")
 public class JavaDynamicTasks {
     /**
@@ -33,8 +37,39 @@ public class JavaDynamicTasks {
      * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
+    // Трудоемкость O(N^2), где N - количество чисел.
+    // Ресурсоемкость O(N)
     public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        throw new NotImplementedError();
+        if (list.size() <= 1) {
+            return list;
+        }
+        ArrayList<Integer> result = new ArrayList<>();
+        int size = list.size();
+        int[] f = new int[size];
+        int[] prev = new int[size];
+        for (int i = 0; i < size; i++) {
+            f[i] = 1;
+            prev [i] = -1;
+            for (int j = 0; j < i; j++)
+                if (list.get(i) > list.get(j) && f[i] <  f[j] + 1){
+                    f[i] = f[j] + 1;
+                    prev[i] = j;
+                }
+        }
+        int max = f[0];
+        int pos = 0;
+        for (int i = 0; i < size; i++) {
+            if (f[i] > max) {
+                max = f[i];
+                pos = i;
+            }
+        }
+        while (pos != -1){
+            result.add(list.get(pos));
+            pos = prev[pos];
+        }
+        Collections.reverse(result);
+        return result;
     }
 
     /**
@@ -57,8 +92,29 @@ public class JavaDynamicTasks {
      *
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
      */
-    public static int shortestPathOnField(String inputName) {
-        throw new NotImplementedError();
+    // Трудоемкость O(N*M), где N - количество строк, М - количество столбцов.
+    // Ресурсоемкость O(N*M)
+    public static int shortestPathOnField(String inputName) throws IOException {
+        List<String> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputName))) {
+           for (String line; (line = br.readLine()) != null;)
+               list.add(line.replaceAll(" ", ""));
+        }
+        int rows = list.size();
+        int columns = list.get(0).length();
+        int[][] matrix = new int[rows][columns];
+        matrix[0][0] = list.get(0).charAt(0) - 48;
+        for (int i = 1; i < rows; i++)
+            matrix[i][0] = list.get(i).charAt(0) - 48 + matrix[i - 1][0];
+        for (int i = 1; i < columns; i++)
+            matrix[0][i] = list.get(0).charAt(i) - 48 + matrix[0][i - 1];
+        for (int i = 1; i < rows; i++) {
+            for (int j = 1; j < columns; j++) {
+                matrix[i][j] = min(matrix[i - 1][j], min(matrix[i][j - 1], matrix[i - 1][j - 1]))
+                        + list.get(i).charAt(j) - 48;
+            }
+        }
+        return matrix[rows - 1][columns - 1];
     }
 
     // Задачу "Максимальное независимое множество вершин в графе без циклов"

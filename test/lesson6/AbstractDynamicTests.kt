@@ -44,12 +44,18 @@ abstract class AbstractDynamicTests {
                 23, 76, 34, 93, 123, 21, 56, 87, 91, 12, 45, 98, 140, 12, 5, 38, 349, 65, 94,
                 45, 76, 15, 99, 100, 88, 84, 35, 88
         )))
+        assertEquals(listOf(3, 4, 6, 7, 11), longestIncreasingSubSequence(listOf(9, 3, 10, 4, 8, 1, 2, 12, 6, 5, 7, 11)))
+        assertEquals(listOf(0, 1), longestIncreasingSubSequence(listOf(0, 0, 0, 0, 0, 1, 0, 0, 0)))
+        assertEquals(listOf(-3, -1, 0, 8, 12), longestIncreasingSubSequence(listOf(-3, 9, -1, 0, -2, 8, 1, 12, 6, 3)))
     }
 
     fun shortestPathOnField(shortestPathOnField: (String) -> Int) {
         assertEquals(1, shortestPathOnField("input/field_in2.txt"))
         assertEquals(12, shortestPathOnField("input/field_in1.txt"))
         assertEquals(43, shortestPathOnField("input/field_in3.txt"))
+        assertEquals(0, shortestPathOnField("input/field_in4.txt"))
+        assertEquals(42, shortestPathOnField("input/field_in5.txt"))
+
     }
 
 }
